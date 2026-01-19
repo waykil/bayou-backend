@@ -9,6 +9,20 @@ app.use(express.json());
 // 🔒 LİSANS VERİTABANI (Örnek Anahtarlar)
 let licenses = [
     {
+        key: "BAYOU-E52E-203E",
+        hwid: "",
+        expiryDate: "2026-02-18T14:47:13.734Z",
+        type: "AYLIK",
+        status: "active"
+    },
+    {
+        key: "BAYOU-1858-F30C",
+        hwid: "",
+        expiryDate: "2026-02-18T14:35:29.163Z",
+        type: "AYLIK",
+        status: "active"
+    },
+    {
         key: "BAYOU-5674-517E",
         hwid: "",
         expiryDate: "2026-02-18T13:19:56.295Z",
