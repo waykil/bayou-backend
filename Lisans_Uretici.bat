@@ -33,7 +33,7 @@ if /i "%yukle%"=="E" (
     echo Sunucuya yukleniyor...
     "C:\Program Files\Git\bin\git.exe" add .
     "C:\Program Files\Git\bin\git.exe" commit -m "Yeni Lisans Eklendi - %date%"
-    "C:\Program Files\Git\bin\git.exe" push
+    "C:\Program Files\Git\bin\git.exe" push origin main
     echo.
     echo ? ISLEM TAMAM! Lisans Render.com'da aktif ediliyor...
 ) else (
