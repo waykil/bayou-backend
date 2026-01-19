@@ -1,0 +1,1333 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayou | Live Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;800&family=Russo+One&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gs-color: #A90432;
+            /* Galatasaray Red */
+            --gs-accent: #FDB912;
+            /* Galatasaray Yellow */
+            --fb-color: #002D72;
+            /* Fenerbahce Blue */
+            --fb-accent: #FEF200;
+            /* Fenerbahce Yellow */
+            --bjk-color: #111111;
+            /* Besiktas Black */
+            --bjk-accent: #FFFFFF;
+            /* Besiktas White */
+            --ts-color: #8E0F33;
+            /* Trabzonspor Red */
+            --ts-accent: #0DB7EA;
+            /* Trabzonspor Blue */
+
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gloss-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: #02020a;
+            background: radial-gradient(circle at top, #1a237e 0%, #02020a 100%);
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ❄️ SNOW EFFECT */
+        #snow-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 📱 VERTICAL MOBILE FORMAT CONTAINER - Optimized for 1080x1920 */
+        .mobile-container {
+            width: 1080px;
+            height: 1920px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+            overflow: hidden;
+        }
+
+        /* 📺 SCOREBOARD HEADER */
+        .broadcast-header {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .clock-container {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            border: 4px solid #00d2ff;
+            padding: 30px 20px;
+            border-radius: 0 0 60px 60px;
+            box-shadow:
+                0 0 40px rgba(0, 210, 255, 0.3),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 20;
+            backdrop-filter: blur(20px);
+            margin-top: -10px;
+            width: 650px;
+            height: 240px;
+            transition: all 0.5s ease;
+        }
+
+        .clock-container.panic-mode {
+            border-color: #ff0000;
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.5);
+        }
+
+        #timer {
+            font-family: 'Russo One', sans-serif;
+            font-size: 11rem;
+            line-height: 1;
+            color: #fff;
+            text-shadow:
+                0 0 20px #00d2ff,
+                0 0 40px #00d2ff,
+                0 0 80px rgba(0, 210, 255, 0.5);
+            letter-spacing: 5px;
+            font-weight: 900;
+            text-align: center;
+            width: 100%;
+            transition: all 0.5s ease;
+        }
+
+        .clock-container.panic-mode #timer {
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 80px rgba(255, 0, 0, 0.8);
+        }
+
+        .timer-label {
+            position: absolute;
+            top: -50px;
+            background: #00d2ff;
+            color: #111;
+            padding: 8px 30px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            border-radius: 20px 20px 0 0;
+            text-transform: uppercase;
+            box-shadow: 0 -10px 30px rgba(0, 210, 255, 0.4);
+            letter-spacing: 2px;
+            transition: all 0.5s ease;
+        }
+
+        .clock-container.panic-mode .timer-label {
+            background: #ff0000;
+            color: #fff;
+            box-shadow: 0 -10px 30px rgba(255, 0, 0, 0.6);
+        }
+
+        /* 📣 TOP CTA - NEON VERSION */
+        .top-cta {
+            width: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 210, 255, 0.2), transparent);
+            text-align: center;
+            padding: 35px 0;
+            margin-bottom: 50px;
+            border-top: 2px solid rgba(0, 210, 255, 0.4);
+            border-bottom: 2px solid rgba(0, 210, 255, 0.4);
+            font-family: 'Russo One', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 2px;
+            animation: bounce 3s infinite ease-in-out;
+            position: relative;
+            z-index: 5;
+            transition: all 0.5s ease;
+        }
+
+        .top-cta.panic-mode {
+            background: linear-gradient(90deg, transparent, rgba(239, 35, 60, 0.4), transparent);
+            border-top: 3px solid #ff0000;
+            border-bottom: 3px solid #ff0000;
+        }
+
+        .cta-p1 {
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .cta-highlight {
+            color: #00d2ff;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+            font-size: 3.5rem;
+            transition: all 0.5s ease;
+        }
+
+        .top-cta.panic-mode .cta-highlight {
+            color: #ffffff;
+            background: #ff0000;
+            padding: 0 15px;
+            border-radius: 10px;
+            text-shadow: 0 0 20px #fff;
+        }
+
+        .cta-p2 {
+            display: block;
+            color: #00d2ff;
+            font-size: 1.8rem;
+            margin-top: 10px;
+            font-family: 'Exo 2';
+            font-weight: 800;
+            letter-spacing: 5px;
+            transition: all 0.5s ease;
+        }
+
+        .top-cta.panic-mode .cta-p2 {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+
+        /* 💊 LIVE STATUS PILL */
+        .status-pill-container {
+            width: 950px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 60px;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .live-tag {
+            background: #ff4757;
+            color: white;
+            font-family: 'Russo One';
+            font-size: 1.5rem;
+            padding: 5px 25px;
+            border-radius: 10px;
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 71, 87, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
+            }
+        }
+
+        .status-commentary {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 📊 STANDINGS CONTAINER */
+        .standings-container {
+            position: relative;
+            width: 100%;
+            padding: 0 40px;
+            height: 850px;
+        }
+
+        /* 🃏 TEAM CARD (REFINED) */
+        .team-card {
+            position: absolute;
+            left: 40px;
+            right: 40px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 80px;
+            display: flex;
+            align-items: center;
+            overflow: visible;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            backdrop-filter: blur(15px);
+            margin-bottom: 10px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Progress bar styles are now handled inline for better reliability */
+        .card-content {
+            position: relative;
+            z-index: 5;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 40px;
+            border: 2px solid transparent;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        #fb .progress-bar {
+            background: var(--fb-color);
+            filter: brightness(1.2);
+        }
+
+        #gs .progress-bar {
+            background: var(--gs-color);
+            filter: brightness(1.2);
+        }
+
+        #bjk .progress-bar {
+            background: #fff;
+        }
+
+        #ts .progress-bar {
+            background: var(--ts-color);
+            filter: brightness(1.2);
+        }
+
+        /* Team Specific Glows */
+        #gs.team-card {
+            box-shadow: 0 0 15px rgba(169, 4, 50, 0.15);
+            border-color: rgba(169, 4, 50, 0.3);
+        }
+
+        #fb.team-card {
+            box-shadow: 0 0 15px rgba(0, 45, 114, 0.15);
+            border-color: rgba(0, 45, 114, 0.3);
+        }
+
+        #bjk.team-card {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #ts.team-card {
+            box-shadow: 0 0 15px rgba(142, 15, 51, 0.15);
+            border-color: rgba(142, 15, 51, 0.3);
+        }
+
+        /* Logo Specific Glows */
+        #gs .logo-box {
+            box-shadow: 0 0 15px var(--gs-color);
+            border-color: var(--gs-accent);
+        }
+
+        #fb .logo-box {
+            box-shadow: 0 0 15px var(--fb-color);
+            border-color: var(--fb-accent);
+        }
+
+        #bjk .logo-box {
+            box-shadow: 0 0 15px var(--bjk-accent);
+            border-color: #555;
+        }
+
+        #ts .logo-box {
+            box-shadow: 0 0 15px var(--ts-color);
+            border-color: var(--ts-accent);
+        }
+
+        .logo-box {
+            width: 130px;
+            height: 130px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+
+        .logo-box img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+        }
+
+        .card-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 40px 0 10px;
+            /* Reduced left padding to align logo to the far left */
+            gap: 30px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .team-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .team-name {
+            font-size: 2.8rem;
+            color: #fff;
+            letter-spacing: 3px;
+            font-weight: 800;
+        }
+
+        .team-status {
+            font-size: 1.4rem;
+            color: #fdb912;
+            font-weight: 700;
+        }
+
+        .score-box {
+            font-size: 7rem;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            font-weight: 900;
+        }
+
+        /* 👑 LEADER STYLES */
+        .team-card.leader {
+            border: 2px solid #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            transform: scale(1.02);
+            z-index: 5;
+        }
+
+        .team-card.leader .rank-box {
+            color: #FFD700;
+            text-shadow: 0 0 10px #FFD700;
+        }
+
+        .team-card.leader .logo-box {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .crown-icon {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            display: none;
+            z-index: 15;
+            animation: crown-float 2s infinite ease-in-out;
+        }
+
+        @keyframes crown-float {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-15px);
+            }
+        }
+
+        .team-card.leader .crown-icon {
+            display: block;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 130px;
+            /* Match logo-box width */
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* ✨ VOTE FLASH */
+        @keyframes flashInfo {
+            0% {
+                background: rgba(255, 255, 255, 0.8);
+            }
+
+            100% {
+                background: transparent;
+            }
+        }
+
+        .flash-anim {
+            animation: flashInfo 0.3s ease-out;
+        }
+
+        /* ℹ️ UNIFIED INFO BLOCKS (STAGE 3) */
+        .info-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            margin-top: auto;
+            margin-bottom: 60px;
+            padding: 0 40px;
+        }
+
+        .now-playing-bar {
+            font-family: 'Russo One';
+            font-size: 1.4rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 15px 40px;
+            border-radius: 40px;
+            border: 2px solid transparent;
+            margin-top: 30px;
+            /* Biraz aşağı kaydırıldı */
+        }
+
+        .last-winner-card {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lw-title {
+            font-size: 1.4rem;
+            color: #aaa;
+            font-weight: 700;
+            letter-spacing: 4px;
+        }
+
+        .lw-team {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Russo One';
+            font-size: 2.8rem;
+            color: #fdb912;
+        }
+
+        .bonus-instruction-bar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            /* Beyaz renk silindi, saydam yapıldı */
+            border: 4px solid #ff0000;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            color: #ffffff;
+            /* Siyah olan yerler beyaz yapıldı */
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+            }
+
+            100% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            }
+        }
+
+        .bonus-instruction-bar b {
+            color: #ff0000;
+        }
+
+        /* 🔔 NOTIFICATIONS */
+        .notification-bar {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #D90429, #ef233c);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            box-shadow: 0 0 40px rgba(217, 4, 41, 0.6);
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+            z-index: 100;
+            font-family: 'Russo One';
+            font-size: 2.4rem;
+            text-transform: uppercase;
+            border-radius: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            transform: translateY(20px);
+        }
+
+        .notification-bar.show {
+            opacity: 1;
+            transform: translateY(0);
+            animation: slow-pulse 2s infinite ease-in-out;
+        }
+
+        /* Hide background elements when notification is over them */
+        .notification-bar.show~.live-tag,
+        .notification-bar.show~.status-commentary {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        @keyframes slow-pulse {
+            0% {
+                box-shadow: 0 0 40px rgba(217, 4, 41, 0.6);
+                background: #D90429;
+            }
+
+            50% {
+                box-shadow: 0 0 80px rgba(217, 4, 41, 1);
+                background: #ff0000;
+            }
+
+            100% {
+                box-shadow: 0 0 40px rgba(217, 4, 41, 0.6);
+                background: #D90429;
+            }
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* 📜 TICKER ANIMATION */
+        .ticker-wrap {
+            width: 100%;
+            background: rgba(255, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 0, 0, 0.2);
+            padding: 8px 0;
+            margin-top: auto;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: #ff4757;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .now-playing-bar {
+            transition: all 0.5s ease;
+        }
+
+        .now-playing-bar.gs {
+            color: var(--gs-accent);
+            background: rgba(169, 4, 50, 0.2);
+            border-color: var(--gs-color);
+        }
+
+        .now-playing-bar.fb {
+            color: var(--fb-accent);
+            background: rgba(0, 45, 114, 0.2);
+            border-color: var(--fb-color);
+        }
+
+        .now-playing-bar.bjk {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            border-color: #555;
+        }
+
+        .now-playing-bar.ts {
+            color: var(--ts-accent);
+            background: rgba(142, 15, 51, 0.2);
+            border-color: var(--ts-color);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        #championOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            animation: fadeInChampion 0.8s ease;
+        }
+
+        #championOverlay.active {
+            display: flex;
+        }
+
+        .champion-img {
+            max-width: 85%;
+            max-height: 80vh;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            animation: zoomInChampion 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 4px solid #FFD700;
+        }
+
+        @keyframes fadeInChampion {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomInChampion {
+            from {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .whistle-img {
+            width: 450px;
+            animation: shake 0.5s infinite;
+            filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.5));
+        }
+
+        .match-start-txt {
+            font-family: 'Russo One', sans-serif;
+            font-size: 8rem;
+            color: #fff;
+            text-transform: uppercase;
+            margin-top: 40px;
+            text-shadow:
+                0 0 10px #ff4757,
+                0 0 20px #ff4757,
+                0 0 40px rgba(255, 71, 87, 0.5);
+            letter-spacing: 2px;
+        }
+
+        /* 🔊 START OVERLAY */
+        #startOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            cursor: pointer;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #startOverlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: white;
+            padding: 30px 80px;
+            font-size: 2.5rem;
+            font-family: 'Russo One', sans-serif;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 0 50px rgba(0, 210, 255, 0.5);
+            animation: pulse-blue 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 60px rgba(0, 210, 255, 0.6);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+            }
+        }
+
+        .start-hint {
+            margin-top: 30px;
+            color: #aaa;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* 🛠️ TEST TOOLS */
+        .test-tools {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 10px;
+            opacity: 0.1;
+            transition: opacity 0.3s;
+        }
+
+        .test-tools:hover {
+            opacity: 1;
+        }
+
+        .test-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(10deg);
+            }
+
+            75% {
+                transform: rotate(-10deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="startOverlay">
+        <button class="start-btn">SİSTEMİ BAŞLAT</button>
+        <div class="start-hint">SESLERİ VE EFEKTLERİ ETKİNLEŞTİRMEK İÇİN TIKLAYIN</div>
+    </div>
+
+    <div class="test-tools">
+        <button class="test-btn" onclick="simulateVote('gs')">GS+1</button>
+        <button class="test-btn" onclick="simulateVote('fb')">FB+1</button>
+        <button class="test-btn" onclick="simulateVote('bjk')">BJK+1</button>
+        <button class="test-btn" onclick="simulateVote('ts')">TS+1</button>
+    </div>
+
+    <canvas id="snow-canvas"></canvas>
+    <div class="mobile-container">
+
+        <!-- 🕙 HEADER -->
+        <div class="top-cta">
+            <span class="cta-p1">TUTTUĞUN TAKIMI</span> <span class="cta-highlight">CHATE YAZ!</span>
+            <span class="cta-p2">MARŞI ÇALMAYA BAŞLASIN! 🎵</span>
+        </div>
+
+        <div class="broadcast-header">
+            <div class="clock-container">
+                <div class="timer-label">EN ÇOK OY ALANIN MARŞI ÇALAR</div>
+                <div id="timer">03:00</div>
+            </div>
+        </div>
+
+        <!-- 💊 LIVE STATUS PILL -->
+        <div class="status-pill-container" style="position: relative;">
+            <!-- 🔔 NOTIFICATION OVERLAY (Moved to top of container for sibling selector) -->
+            <div class="notification-bar" id="notif">
+                <div class="dot" style="width: 25px; height: 25px; border: 4px solid white;"></div>
+                <div id="notifText">MESAJ BEKLENİYOR...</div>
+            </div>
+
+            <div class="live-tag">CANLI</div>
+            <div class="status-commentary" id="liveCommentary">Yarış başlıyor, ilk oyu sen at! 🚀</div>
+        </div>
+
+
+        <!-- 🏆 STANDINGS BOARD -->
+        <div class="standings-container" id="board">
+            <!-- Cards injected via JS -->
+        </div>
+
+        <div class="now-playing-bar" id="nowPlaying" style="margin-top: 40px; margin-bottom: 20px;">
+            🎵 <span id="playingText">MARŞ BEKLENİYOR...</span>
+        </div>
+
+        <!-- ℹ️ UNIFIED INFO STACK -->
+        <div class="info-stack">
+
+            <div class="last-winner-card">
+                <div class="lw-title">&#x1F3C6; SON ŞAMPİYON &#x1F3C6;</div>
+                <div class="lw-team" id="lastWinnerDisplay">
+                    <span id="lwName">YOK</span> <span id="lwScore"
+                        style="font-weight:400; font-size:2rem; color: #fff; margin-left: 10px;">(0)</span>
+                </div>
+            </div>
+
+            <div class="bonus-instruction-bar">
+                &#x1F4AC; Videoyu beğenip chate <b>"beğendim (Takım Adı)"</b> yazarak <b>+5 Puan</b> kazandır! (Örn:
+                beğendim gs)
+            </div>
+        </div>
+
+        <!-- 📜 SLIDING TICKER -->
+        <div class="ticker-wrap">
+            <div class="ticker-text">
+                ⚠️ ABONE OLMAYANLARIN VE VİDEOYU BEĞENMEYENLERİN OYLARI SİSTEM TARAFINDAN OTOMATİK OLARAK İPTAL EDİLİR!
+                • CHATE TAKIMINI YAZARAK OYUNU KULLANABİLİRSİN! ⚠️
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 📢 WHISTLE OVERLAY -->
+    <div class="overlay" id="whistleOverlay">
+        <img src="images/whistle_gold.png" class="whistle-img" id="whistleImg" alt="Düdük">
+        <h1 class="match-start-txt">MAÇ BAŞLIYOR</h1>
+    </div>
+
+    <!-- 🏆 CHAMPION OVERLAY -->
+    <div id="championOverlay">
+        <img src="" class="champion-img" id="championImg" alt="Şampiyon">
+        <div
+            style="margin-top: 40px; font-family: 'Russo One'; font-size: 5rem; color: #FFD700; text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);">
+            TEBRİKLER!</div>
+    </div>
+
+
+    <!-- AUDIO -->
+    <audio id="audio_duduk" src="sounds/duduk.mp3"></audio>
+    <audio id="m_fb" src="sounds/fb.mp3"></audio>
+    <audio id="m_gs" src="sounds/gs.mp3"></audio>
+    <audio id="m_bjk" src="sounds/bjk.mp3"></audio>
+    <audio id="m_ts" src="sounds/ts.mp3"></audio>
+
+    <script>
+        const teams = [
+            { id: 'gs', name: 'GALATASARAY', logo: 'images/gs_logo.png' },
+            { id: 'fb', name: 'FENERBAHÇE', logo: 'images/fb_logo.png' },
+            { id: 'bjk', name: 'BEŞİKTAŞ', logo: 'images/bjk_logo.png' },
+            { id: 'ts', name: 'TRABZONSPOR', logo: 'images/ts_logo.png' }
+        ];
+
+        const board = document.getElementById('board');
+
+        // Initialize Board
+        teams.forEach((t, i) => {
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            card.id = t.id;
+            card.style.top = `${i * 185}px`;
+            card.innerHTML = `
+                <div class="progress-bar-container" style="position: absolute; inset: 0; z-index: 1; overflow: hidden; border-radius: 80px; pointer-events: none;">
+                    <div class="progress-bar" style="width: 0%; height: 100%; transition: width 0.6s ease; opacity: 0.15;"></div>
+                </div>
+                <div class="card-content">
+                    <div class="logo-wrapper">
+                        <div class="crown-icon">👑</div>
+                        <div class="logo-box">
+                            <img src="${t.logo}" alt="${t.id}">
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">${t.name} <span class="score-small" style="font-size:1.8rem; color:#fdb912; font-weight:400">(0)</span></div>
+                        <div class="team-status">YARIŞTA</div>
+                    </div>
+                    <div class="score-box">0</div>
+                    <div class="bonus-indicator" style="position:absolute; right:200px; color:#2ed573; opacity:0; font-weight:bold; font-family:'Russo One'; font-size:3rem">+1</div>
+                </div>
+            `;
+            board.appendChild(card);
+        });
+
+        let currentLeader = null;
+        let lastScores = { gs: 0, fb: 0, bjk: 0, ts: 0 };
+        let currentMarch = null;
+        let isFinalWinner = false;
+
+        // Leader March Logic with cross-fade
+        function playLeaderMarch(teamId) {
+            if (isFinalWinner) return;
+
+            const nextMarch = document.getElementById(`m_${teamId}`);
+            if (!nextMarch) return;
+            if (currentMarch === nextMarch) return;
+
+            if (currentMarch) {
+                const old = currentMarch;
+                let vol = old.volume;
+                const fadeOut = setInterval(() => {
+                    vol -= 0.02;
+                    if (vol <= 0) {
+                        clearInterval(fadeOut);
+                        old.pause();
+                    } else {
+                        old.volume = vol;
+                    }
+                }, 50);
+            }
+
+            currentMarch = nextMarch;
+            currentMarch.currentTime = 0;
+            currentMarch.volume = 0;
+            currentMarch.play().catch(e => console.log("Audio play deferred until user interaction"));
+
+            const teamObj = teams.find(t => t.id === teamId);
+            if (teamObj) {
+                const nowPlaying = document.getElementById('nowPlaying');
+                document.getElementById('playingText').textContent = `${teamObj.name} MARŞI ÇALIYOR`;
+                nowPlaying.className = `now-playing-bar ${teamId}`;
+            }
+
+            let targetVol = 0.3;
+            let volIn = 0;
+            const fadeIn = setInterval(() => {
+                volIn += 0.02;
+                if (volIn >= targetVol) {
+                    clearInterval(fadeIn);
+                    currentMarch.volume = targetVol;
+                } else {
+                    currentMarch.volume = volIn;
+                }
+            }, 50);
+        }
+
+        let ws;
+        function connect() {
+            let host = window.location.host;
+            if (!host || host === "") host = "localhost:3000";
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${host}`;
+            console.log("Bağlanılıyor:", wsUrl);
+
+            try {
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    console.log("Yarış Sunucusuna Bağlanıldı ✅");
+                    document.getElementById('liveCommentary').textContent = "Sunucuya bağlanıldı, yarış başlıyor! 🚀";
+                };
+
+                ws.onerror = (err) => {
+                    console.error("WebSocket Hatası:", err);
+                    document.getElementById('liveCommentary').textContent = "⚠️ Sunucuya bağlanılamadı! Lütfen sunucuyu başlatın.";
+                };
+            } catch (e) {
+                console.error("Bağlantı denemesi başarısız:", e);
+            }
+
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+
+                if (data.type === 'update') {
+                    const totalVotes = Object.values(data.votes).reduce((a, b) => a + b, 0) || 1;
+                    const sorted = Object.keys(data.votes).sort((a, b) => data.votes[b] - data.votes[a]);
+
+                    sorted.forEach((teamId, index) => {
+                        const card = document.getElementById(teamId);
+                        if (!card) return;
+                        const score = data.votes[teamId];
+                        const prevScore = lastScores[teamId] || 0;
+
+                        card.querySelector('.score-box').textContent = score;
+                        card.querySelector('.score-small').textContent = `(${score})`;
+
+                        const percentage = (score / totalVotes) * 100;
+                        card.querySelector('.progress-bar').style.width = `${percentage}%`;
+                        card.style.top = `${index * 185}px`;
+
+                        if (index === 0 && score > 0) {
+                            card.classList.add('leader');
+                        } else {
+                            card.classList.remove('leader');
+                        }
+
+                        if (score > prevScore) {
+                            const diff = score - prevScore;
+                            const indicator = card.querySelector('.bonus-indicator');
+                            indicator.textContent = `+${diff}`;
+                            indicator.style.opacity = 1;
+                            card.classList.remove('flash-anim');
+                            void card.offsetWidth;
+                            card.classList.add('flash-anim');
+                            setTimeout(() => indicator.style.opacity = 0, 1500);
+                        }
+                    });
+
+                    const newLeader = sorted[0];
+                    if (data.votes[newLeader] > 0 && newLeader !== currentLeader) {
+                        currentLeader = newLeader;
+                        const leaderName = teams.find(t => t.id === newLeader).name;
+                        showNotif(`${leaderName} LİDERLİĞE YÜKSELDİ! 🚀`);
+                        document.getElementById('liveCommentary').textContent = `${leaderName} üstünlüğünü koruyor! 🔥`;
+                        playLeaderMarch(newLeader);
+                    }
+                    lastScores = { ...data.votes };
+                }
+
+                if (data.type === 'timer') {
+                    const m = Math.floor(data.timer / 60);
+                    const s = data.timer % 60;
+                    document.getElementById('timer').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+
+                    if (data.timer <= 60 && data.timer > 0) {
+                        const notif = document.getElementById('notif');
+                        const notifText = document.getElementById('notifText');
+                        notifText.textContent = "⚠️ SON 1 DAKİKA! PUANLAR x2 ⚠️";
+                        notif.classList.add('show');
+
+                        // PANIC MODE UI
+                        document.querySelector('.top-cta').classList.add('panic-mode');
+                        document.querySelector('.clock-container').classList.add('panic-mode');
+                    } else if (data.timer === 0) {
+                        document.getElementById('notif').classList.remove('show');
+                        document.querySelector('.top-cta').classList.remove('panic-mode');
+                        document.querySelector('.clock-container').classList.remove('panic-mode');
+                        isFinalWinner = true;
+                    } else {
+                        document.querySelector('.top-cta').classList.remove('panic-mode');
+                        document.querySelector('.clock-container').classList.remove('panic-mode');
+                    }
+                }
+
+                if (data.type === 'match_countdown') {
+                    const overlay = document.getElementById('whistleOverlay');
+                    const championOverlay = document.getElementById('championOverlay');
+                    if (data.value === 0) {
+                        isFinalWinner = false;
+                        championOverlay.classList.remove('active'); // Hide champion overlay if visible
+                        overlay.classList.add('active');
+                        document.getElementById('audio_duduk').currentTime = 0;
+                        document.getElementById('audio_duduk').play().catch(() => { });
+                        setTimeout(() => {
+                            overlay.classList.remove('active');
+                            showNotif("MAÇ BAŞLADI! İYİ OLAN KAZANSIN!");
+                        }, 2000);
+                    }
+                }
+
+                if (data.type === 'champion_update') {
+                    document.getElementById('lwName').textContent = data.lastChampion || "YOK";
+                }
+
+                if (data.type === 'winner') {
+                    isFinalWinner = true;
+                    const winnerId = data.team;
+                    const winner = teams.find(t => t.id === winnerId);
+
+                    // Show Champion Image Overlay
+                    const championOverlay = document.getElementById('championOverlay');
+                    const championImg = document.getElementById('championImg');
+                    championImg.src = `images/${winnerId}_win.png`;
+                    setTimeout(() => { championOverlay.classList.add('active'); }, 1000);
+
+                    showNotif(`🏆 ŞAMPİYON: ${winner.name} 🏆`);
+                    document.getElementById('lwName').textContent = winner.name;
+                    document.getElementById('lwScore').textContent = `(${data.votes[winnerId] || 0})`;
+
+                    if (currentMarch) currentMarch.pause();
+                    currentMarch = document.getElementById(`m_${winnerId}`);
+                    if (currentMarch) {
+                        currentMarch.currentTime = 0;
+                        currentMarch.volume = 1.0;
+                        currentMarch.play().catch(() => { });
+                    }
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("WebSocket kapandı, yeniden bağlanılıyor...");
+                setTimeout(connect, 2000);
+            };
+        }
+
+        connect();
+
+        function showNotif(msg) {
+            const notif = document.getElementById('notif');
+            const notifText = document.getElementById('notifText');
+            if (!notif || !notifText) return;
+            notifText.textContent = msg;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 4000);
+        }
+
+
+        // 🔓 UNLOCK AUDIO ON START
+        document.getElementById('startOverlay').onclick = function () {
+            this.classList.add('hidden');
+
+            // Resume Audio Context if needed and pre-play silent notes or just start background interaction
+            const audios = document.querySelectorAll('audio');
+            audios.forEach(a => {
+                a.play().then(() => {
+                    a.pause();
+                    a.currentTime = 0;
+                }).catch(() => { });
+            });
+
+            console.log("Sesler aktifleştirildi 🔊");
+            if (currentMarch) currentMarch.play().catch(() => { });
+        };
+
+        function simulateVote(team) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'simulate_vote', team: team }));
+            }
+        }
+
+        document.body.onclick = () => { if (currentMarch) currentMarch.play().catch(() => { }); };
+
+        // ❄️ SNOW ANIMATION
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let flakes = [];
+
+        function initSnow() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            flakes = [];
+            for (let i = 0; i < 150; i++) {
+                flakes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speed: Math.random() * 1 + 0.5,
+                    opacity: Math.random() * 0.5 + 0.3
+                });
+            }
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            flakes.forEach(f => {
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                f.y += f.speed;
+                if (f.y > canvas.height) f.y = -10;
+            });
+            ctx.fill();
+            requestAnimationFrame(drawSnow);
+        }
+
+        window.addEventListener('resize', initSnow);
+        initSnow();
+        drawSnow();
+
+    </script>
+</body>
+
+</html>

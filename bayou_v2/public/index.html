@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAYOU ELITE ARENA - V2.5</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030308;
+            --fb-color: #ffd700;
+            --gs-color: #ff3333;
+            --bjk-color: #ffffff;
+            --ts-color: #830000;
+            --accent-gold: #ffcc00;
+            --glass: rgba(15, 15, 30, 0.85);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            width: 1080px;
+            height: 1920px;
+            background-image: radial-gradient(circle at 50% 50%, #0a0a20 0%, #030308 100%);
+        }
+
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #arena {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        #header-panel {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 204, 0, 0.2);
+            border-radius: 40px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+        }
+
+        #header-panel h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 60px;
+            background: linear-gradient(to right, #ffffff, var(--accent-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: 8px;
+            font-weight: 900;
+        }
+
+        #cta-text {
+            color: var(--accent-gold);
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(20, 20, 40, 0.6);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.05), 0 15px 40px rgba(0, 0, 0, 0.6);
+            animation: float 10s infinite ease-in-out;
+        }
+
+        .bubble.elite {
+            border: 5px solid var(--accent-gold);
+            box-shadow: 0 0 60px rgba(255, 204, 0, 0.4);
+        }
+
+        .bubble img {
+            width: 70%;
+            height: auto;
+            pointer-events: none;
+        }
+
+        .user-name {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 15px;
+            color: white;
+            text-shadow: 0 4px 10px black;
+        }
+
+        #score-panel {
+            position: absolute;
+            bottom: 80px;
+            right: 80px;
+            width: 480px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            z-index: 100;
+        }
+
+        #score-panel h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 38px;
+            color: var(--accent-gold);
+            margin: 0 0 25px 0;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 204, 0, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .row-name {
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .row-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(25px, -45px) rotate(4deg);
+            }
+
+            66% {
+                transform: translate(-25px, -20px) rotate(-4deg);
+            }
+        }
+
+        .particle {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles"></div>
+    <div id="header-panel">
+        <h1>BAYOU ELITE ARENA</h1>
+        <div id="cta-text">Tuttuğun takımı yaz, arenayı domine et!</div>
+    </div>
+    <div id="arena"></div>
+    <div id="score-panel">
+        <h2>SIRALAMA</h2>
+        <div id="score-list"></div>
+    </div>
+
+    <script>
+        const ws = new WebSocket(`ws://${location.host}`);
+        const arena = document.getElementById('arena');
+        const scoreList = document.getElementById('score-list');
+
+        // Logolar için doğrudan yol (images/ klasörü public içinde olmalı)
+        const teamAssets = {
+            fb: 'images/fb_logo.png',
+            gs: 'images/gs_logo.png',
+            bjk: 'images/bjk_logo.png',
+            ts: 'images/ts_logo.png'
+        };
+
+        function createBubble(team, name = "", isElite = false) {
+            const b = document.createElement('div');
+            b.className = `bubble ${isElite ? 'elite' : ''}`;
+            b.id = `bubble-${team}-${name || 'main'}`;
+
+            const baseSize = isElite ? 460 : 320;
+            b.style.width = baseSize + 'px';
+            b.style.height = baseSize + 'px';
+            b.style.left = (Math.random() * 500 + 150) + 'px';
+            b.style.top = (Math.random() * 1000 + 400) + 'px';
+
+            const img = document.createElement('img');
+            img.src = teamAssets[team] || 'images/gs_logo.png';
+            img.onerror = () => { img.src = 'https://via.placeholder.com/200?text=' + team; };
+            b.appendChild(img);
+
+            const n = document.createElement('div');
+            n.className = 'user-name';
+            n.innerText = name ? '@' + name : team.toUpperCase();
+            b.appendChild(n);
+
+            arena.appendChild(b);
+            return b;
+        }
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'init' || data.type === 'update') {
+                updateUI(data);
+            }
+        };
+
+        function updateUI(data) {
+            const { votes, elitePlayers } = data;
+            scoreList.innerHTML = '';
+            Object.entries(votes).sort((a, b) => b[1] - a[1]).forEach(([t, s]) => {
+                const row = document.createElement('div');
+                row.className = 'team-row';
+                row.innerHTML = `<span class="row-name">${t.toUpperCase()}</span> <span class="row-score">${Math.floor(s)}</span>`;
+                scoreList.appendChild(row);
+            });
+
+            Object.keys(votes).forEach(team => {
+                let id = `bubble-${team}-main`;
+                let b = document.getElementById(id);
+                if (!b) b = createBubble(team);
+                const growth = Math.min(votes[team] * 0.7, 600);
+                b.style.width = (320 + growth) + 'px';
+                b.style.height = (320 + growth) + 'px';
+            });
+
+            Object.entries(elitePlayers).forEach(([name, info]) => {
+                let id = `bubble-${info.team}-${name}`;
+                if (!document.getElementById(id)) createBubble(info.team, name, true);
+            });
+        }
+
+        // Parçacıklar
+        const partDiv = document.getElementById('particles');
+        for (let i = 0; i < 100; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.width = Math.random() * 10 + 'px';
+            p.style.height = p.style.width;
+            p.style.left = Math.random() * 1080 + 'px';
+            p.style.top = Math.random() * 1920 + 'px';
+            p.style.animation = `float ${Math.random() * 15 + 10}s infinite alternate`;
+            partDiv.appendChild(p);
+        }
+    </script>
+</body>
+
+</html>

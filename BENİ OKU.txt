@@ -1,0 +1,12 @@
+SCRİPTİN CALISMASI İÇİN : 
+
+https://nodejs.org/dist/v24.11.1/node-v24.11.1-x64.msi
+
+bu linki kopyala-yapıştır yaparak indirin ve kurun. Node.js kurmadan script çalışmaz. 
+Eğer link çalışmaz ise, https://nodejs.org/en/download buradan bulabilirsiniz.
+
+
+1 - baslat dosyasına tıklayıp Yayın ID girmeniz yeterlidir.
+    Otomatik olarak sohbeti okumaya başlar ve scripti çalıştırır.
+2 - OBS veya Streamlabs yayın programınızda Tarayıcı Kaynağı ekleyip adrese localhost:3000 eklemeniz gerekli.
+3 - Sonraki yayınlarda yayın açtıktan sonra, veya herhangi bir takılma olursa Yayın programına eklediğiniz kaynağa çift tıklayıp önbelleği yenile yapmanız yeterli. 

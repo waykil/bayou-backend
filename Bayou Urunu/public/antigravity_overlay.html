@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Sci-Fi Overlay 🚀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --gs-color: #ff4757;
+            --fb-color: #f1c40f;
+            --bjk-color: #ffffff;
+            --ts-color: #3498db;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            width: 500px;
+            height: 900px;
+            background: #02020a;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* ✨ BACKGROUND EFFECTS */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 10%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(188, 19, 254, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* 🚀 ZERO-G FLOAT ANIMATION */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(0.5deg);
+            }
+        }
+
+        .float-container {
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.1));
+        }
+
+        .float-delayed {
+            animation: float 8s ease-in-out infinite reverse;
+            animation-delay: -2s;
+        }
+
+        /* 📺 GLASS PANELS */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .header-cta {
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        #timer {
+            font-size: 4rem;
+            font-weight: 900;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 20px var(--neon-purple);
+            letter-spacing: 5px;
+        }
+
+        /* 📊 PROGRESS BARS */
+        .standings {
+            width: 100%;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+            height: 400px;
+        }
+
+        .team-row {
+            width: 100%;
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 35px;
+            /* Rounded pill shape */
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .progress-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0%;
+            background: var(--bg);
+            opacity: 0.15;
+            transition: width 1s ease;
+        }
+
+        .bar-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .team-name {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .score {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--clr);
+            text-shadow: 0 0 15px var(--clr);
+        }
+
+        /* 🏷️ FOOTER */
+        .footer {
+            margin-top: auto;
+            width: 100%;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-pill {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .footer-pill b {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .neon-border-blue {
+            border-bottom: 3px solid var(--neon-blue);
+        }
+
+        .neon-border-purple {
+            border-bottom: 3px solid var(--neon-purple);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER SECTION -->
+    <div class="float-container" style="width: 100%;">
+        <div class="glass-panel">
+            <div class="header-cta">TUTTUĞUN TAKIMI YAZ</div>
+            <div id="timer">03:00</div>
+        </div>
+    </div>
+
+    <!-- MAIN CORE (STANDINGS) -->
+    <div class="standings" id="board">
+        <!-- Injected via JS -->
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <div class="footer float-delayed">
+        <div class="glass-panel footer-pill neon-border-blue">
+            ABONE <b>OL</b>
+        </div>
+        <div class="glass-panel footer-pill neon-border-purple">
+            VİDEOYU <b>BEĞEN</b>
+        </div>
+    </div>
+
+    <script>
+        const teams = [
+            { id: 'gs', name: 'GS', color: '#ff4757', votes: 0 },
+            { id: 'fb', name: 'FB', color: '#f1c40f', votes: 0 },
+            { id: 'bjk', name: 'BJK', color: '#ffffff', votes: 0 },
+            { id: 'ts', name: 'TS', color: '#3498db', votes: 0 }
+        ];
+
+        const board = document.getElementById('board');
+
+        function init() {
+            teams.forEach((t, i) => {
+                const row = document.createElement('div');
+                row.className = 'team-row';
+                row.id = `row-${t.id}`;
+                row.style.top = `${i * 95}px`;
+                row.innerHTML = `
+                    <div class="bar-container" style="--bg: ${t.color}; --clr: ${t.color}">
+                        <div class="progress-fill" id="fill-${t.id}"></div>
+                        <div class="bar-content">
+                            <span class="team-name">${t.name}</span>
+                            <span class="score" id="score-${t.id}">0</span>
+                        </div>
+                    </div>
+                `;
+                board.appendChild(row);
+            });
+            startSimulation();
+            startTimer(180);
+        }
+
+        // Mock Live Updates Simulation
+        function startSimulation() {
+            setInterval(() => {
+                const lucky = teams[Math.floor(Math.random() * teams.length)];
+                lucky.votes += Math.floor(Math.random() * 5) + 1;
+                updateUI();
+            }, 1000);
+        }
+
+        function updateUI() {
+            const total = teams.reduce((a, b) => a + b.votes, 0) || 1;
+
+            // Re-order based on votes
+            const sorted = [...teams].sort((a, b) => b.votes - a.votes);
+
+            sorted.forEach((t, index) => {
+                const row = document.getElementById(`row-${t.id}`);
+                const score = document.getElementById(`score-${t.id}`);
+                const fill = document.getElementById(`fill-${t.id}`);
+
+                row.style.top = `${index * 95}px`;
+                score.innerText = t.votes;
+                fill.style.width = `${(t.votes / total) * 100}%`;
+
+                // Zero-G Leading Team Glow
+                if (index === 0 && t.votes > 0) {
+                    row.style.filter = 'drop-shadow(0 0 15px ' + t.color + '88)';
+                    row.style.zIndex = '5';
+                } else {
+                    row.style.filter = 'none';
+                    row.style.zIndex = '1';
+                }
+            });
+        }
+
+        function startTimer(duration) {
+            let timer = duration;
+            const display = document.getElementById('timer');
+            const interval = setInterval(() => {
+                let m = Math.floor(timer / 60);
+                let s = timer % 60;
+                display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    display.innerText = "0:00";
+                }
+            }, 1000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

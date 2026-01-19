@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BAYOU PRO - ARENA V3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Outfit:wght@600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #050510;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            height: 1920px;
+            width: 1080px;
+            overflow: hidden;
+        }
+
+        #arena {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #101030, #050510);
+        }
+
+        #header {
+            position: absolute;
+            top: 60px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #header h1 {
+            font-family: 'Orbitron';
+            font-size: 65px;
+            text-shadow: 0 0 30px gold;
+            margin: 0;
+            color: gold;
+            letter-spacing: 5px;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: width 0.5s, height 0.5s;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .bubble img {
+            width: 70%;
+            height: auto;
+        }
+
+        .bubble.elite {
+            border: 6px solid gold;
+            box-shadow: 0 0 80px gold;
+        }
+
+        #scores {
+            position: absolute;
+            bottom: 80px;
+            right: 50px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 35px;
+            border-radius: 40px;
+            border: 1px solid #444;
+            width: 420px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 38px;
+            margin: 18px 0;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        #test-panel {
+            display: none;
+            position: absolute;
+            top: 200px;
+            left: 50px;
+            background: rgba(20, 20, 40, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            z-index: 1000;
+            width: 320px;
+            border: 2px solid gold;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="arena">
+        <div id="header">
+            <h1>BAYOU PRO</h1>
+            <p style="font-size: 32px; color: gold; margin-top: 15px; font-weight: bold; letter-spacing: 2px;">TAKIMINI
+                YAZ ARENAYI SALLA!</p>
+        </div>
+    </div>
+
+    <div id="scores">
+        <div style="color: gold; font-size: 40px; text-align: center; margin-bottom: 25px; font-family: 'Orbitron';">
+            ARENA SKORLARI</div>
+        <div id="list"></div>
+    </div>
+
+    <!-- TEST PANELİ -->
+    <div id="test-panel">
+        <h3 style="margin:0 0 15px 0; color:gold; text-align:center;">🛠️ TEST SİSTEMİ</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <button onclick="st('fb', 1)" style="padding:12px;">FB +1</button>
+            <button onclick="st('fb', 10)" style="padding:12px; background:gold;">FB SC</button>
+            <button onclick="st('gs', 1)" style="padding:12px;">GS +1</button>
+            <button onclick="st('gs', 10)" style="padding:12px; background:gold;">GS SC</button>
+            <button onclick="st('bjk', 1)" style="padding:12px;">BJK +1</button>
+            <button onclick="st('bjk', 10)" style="padding:12px; background:gold;">BJK SC</button>
+            <button onclick="st('ts', 1)" style="padding:12px;">TS +1</button>
+            <button onclick="st('ts', 10)" style="padding:12px; background:gold;">TS SC</button>
+        </div>
+        <button onclick="ws.send(JSON.stringify({type:'reset'}))"
+            style="width:100%; margin-top:20px; padding:12px; background:red; color:white; font-weight:bold; border-radius:10px;">SKORLARI
+            SIFIRLA</button>
+    </div>
+
+    <script>
+        const ws = new WebSocket(`ws://${location.host}`);
+        const list = document.getElementById('list');
+        const arena = document.getElementById('arena');
+        const testPanel = document.getElementById('test-panel');
+        const logos = { fb: 'images/fb_logo.png', gs: 'images/gs_logo.png', bjk: 'images/bjk_logo.png', ts: 'images/ts_logo.png' };
+
+        let bubbleData = {};
+
+        function st(team, val) { ws.send(JSON.stringify({ type: val === 1 ? 'test_vote' : 'test_sc', team, name: 'TestUser' })); }
+
+        window.onkeydown = (e) => { if (e.key.toLowerCase() === 't') testPanel.style.display = testPanel.style.display === 'none' ? 'block' : 'none'; };
+
+        function update(data) {
+            list.innerHTML = '';
+            Object.entries(data.votes).sort((a, b) => b[1] - a[1]).forEach(([t, s]) => {
+                list.innerHTML += `<div class="row"><span>${t.toUpperCase()}</span><span>${Math.floor(s)}</span></div>`;
+                let b = document.getElementById('b-' + t);
+                if (!b) {
+                    b = document.createElement('div');
+                    b.id = 'b-' + t;
+                    b.className = 'bubble';
+                    let sx = Math.random() * 600 + 100, sy = Math.random() * 800 + 400;
+                    bubbleData[t] = { x: sx, y: sy, dx: (Math.random() - 0.5) * 2, dy: (Math.random() - 0.5) * 2 };
+                    b.style.left = sx + 'px'; b.style.top = sy + 'px';
+                    b.innerHTML = `<img src="${logos[t]}"><div style="font-size:32px; font-weight:bold; margin-top:20px; text-shadow:0 0 10px black;">${t.toUpperCase()}</div>`;
+                    arena.appendChild(b);
+                }
+                let size = 300 + Math.min(s * 0.8, 600);
+                b.style.width = size + 'px'; b.style.height = size + 'px';
+            });
+        }
+
+        function animate() {
+            Object.keys(bubbleData).forEach(t => {
+                let p = bubbleData[t], b = document.getElementById('b-' + t);
+                if (b) {
+                    p.x += p.dx; p.y += p.dy;
+                    if (p.x < 50 || p.x > (1080 - b.offsetWidth - 50)) p.dx *= -1;
+                    if (p.y < 300 || p.y > (1920 - b.offsetHeight - 300)) p.dy *= -1;
+                    b.style.left = p.x + 'px'; b.style.top = p.y + 'px';
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+        ws.onmessage = (e) => update(JSON.parse(e.data));
+    </script>
+</body>
+
+</html>

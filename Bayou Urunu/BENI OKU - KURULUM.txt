@@ -1,0 +1,36 @@
+=====================================================
+          BAYOU CANLI SİSTEM - KULLANIM KILAVUZU
+=====================================================
+
+Bu yazılımı satın aldığınız için teşekkürler! Kurulum ve aktivasyon için lütfen aşağıdaki adımları izleyin:
+
+1. ADIM: ALTYAPI KURULUMU
+-------------------------
+Programı ilk kez çalıştırıyorsanız, klasördeki "kurulum.bat" dosyasına çift tıklayın ve işlemlerin bitmesini bekleyin. (Bu işlem bilgisayarınıza gerekli kütüphaneleri yükler ve sadece bir kez yapılır).
+
+2. ADIM: PROGRAMI BAŞLATMA VE LİSANS ALMA
+-----------------------------------------
+Klasördeki "Bayou_Baslat.bat" dosyasına çift tıklayarak programı başlatın. 
+Program açıldığında size özel bir "Hardware ID" (Cihaz Kimliği) kodu verecektir. 
+Bu kodu kopyalayıp bize (Bayou Destek) iletin.
+
+3. ADIM: AKTİVASYON
+-------------------
+Size ileteceğimiz anahtarı bir metin dosyasına koyup adını "license.txt" yapın.
+Bu dosyayı "Bayou.exe" dosyasının hemen yanına yapıştırın.
+Tekrar "Bayou_Baslat.bat"ı çalıştırdığınızda sisteminiz aktif olacaktır!
+
+ÖNEMLİ NOTLAR:
+--------------
+- Programı her zaman "Bayou_Baslat.bat" üzerinden açmanız önerilir.
+- Lisans dosyasının adının tam olarak "license.txt" olduğundan emin olun.
+- Lisans tek bir bilgisayar için geçerlidir, başka bilgisayara taşınamaz.
+
+PRO İPUCU (OBS KULLANIMI):
+--------------------------
+Yazılımı OBS üzerinden canlı yayına vermek için:
+1. "Tarayıcı (Browser)" kaynağı ekleyin.
+2. URL kısmına "http://localhost:3000" yazın.
+3. Genişlik: 1080, Yükseklik: 1920 (veya yayınınızın çözünürlüğü) yapın.
+
+Bayou Destek Ekibi

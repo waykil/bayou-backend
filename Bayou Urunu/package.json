@@ -1,0 +1,21 @@
+{
+  "name": "bayou-urunu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "http": "^0.0.1-security",
+    "node-machine-id": "^1.1.12",
+    "path": "^0.12.7",
+    "puppeteer": "^24.35.0",
+    "ws": "^8.19.0"
+  }
+}
