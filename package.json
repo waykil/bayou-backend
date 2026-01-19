@@ -1,9 +1,8 @@
 {
   "name": "bayou-backend-root",
-  "version": "1.0.0",
-  "description": "Bayou License Server Root",
-  "main": "bayou_backend/index.js",
+  "version": "1.0.1",
   "scripts": {
+    "install": "npm install",
     "start": "node bayou_backend/index.js"
   },
   "dependencies": {
